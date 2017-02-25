@@ -4,6 +4,10 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import RegexValidator
 from decimal import Decimal
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from rest_framework.authtoken.models import Token
+from django.conf import settings
 
 # Create your models here.
 
@@ -17,6 +21,7 @@ class Commuter(models.Model):
     middleName = models.CharField(max_length=50, blank=True)
     lastName = models.CharField(max_length=50)
     gender = models.CharField(max_length=1, choices=GENDER)
+    userid = models.CharField(max_length=32, unique=True)
     prof_pic = models.ImageField(upload_to='commuter_profile_pics/%Y-%m-%d/', blank=True)
     dob = models.DateField()
     aadhaar_regex = RegexValidator(regex=r'^\d{12}$', message="Aadhaar Number must contain 12 Digits!")
@@ -29,13 +34,6 @@ class Commuter(models.Model):
     def __str__(self):
         return self.firstName
 
-class Route(models.Model):
-    name = models.CharField(max_length=50)
-    bus = models.ForeignKey(Bus)
-
-    def __str__(self):
-        return self.name
-
 class Bus(models.Model):
     user = models.OneToOneField(User)
     name = models.CharField(max_length=50)
@@ -45,6 +43,23 @@ class Bus(models.Model):
     def __str__(self):
         return self.name
 
+class Route(models.Model):
+    name = models.CharField(max_length=50)
+    bus = models.ForeignKey(Bus)
+
+    def __str__(self):
+        return self.name
+
 class Trip(models.Model):
     user = models.OneToOneField(User)
-    bus = models.OneToOneField(Bus)
+    route = models.OneToOneField(Route)
+    start = models.IntegerField()
+    stop = models.IntegerField()
+
+    def __str__(self):
+        return u'%s %s' % (self.user.name, self.route.name)
+
+@receiver(post_save, sender=settings.AUTH_USER_MODEL)
+def create_auth_token(sender, instance=None, created=False, **kwargs):
+    if created:
+        Token.objects.create(user=instance)
