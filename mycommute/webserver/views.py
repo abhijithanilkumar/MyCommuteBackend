@@ -83,7 +83,7 @@ def buslogin(request):
     buser = authenticate(username=username, password=password)
     if buser is not None:
         bus = Bus.objects.get(user=buser)
-        route, created = Route.objects.update_or_create(
+        route = Route.objects.create(
             name=rname,
             bus=bus
         )
@@ -114,33 +114,31 @@ def readqr(request):
     user = commuter.user
     if Trip.objects.filter(user=user).exists():
         trip = Trip.objects.filter(user=user).order_by('-id')[0]
-        if trip.start == trip.stop:
+        if trip.cost==-1:
             trip.stop = reading
-            cost = 4*(trip.stop-trip.start)
-            commuter.wallet = commuter.wallet - cost
+            trip.cost = 4*(trip.stop-trip.start)
+            commuter.wallet = commuter.wallet - trip.cost
             trip.save()
             commuter.save()
-            response = "Trip Ended. Cost : %d" % (cost)
+            response = "Trip Ended. Cost : %d Wallet Balance : %f" % (trip.cost, commuter.wallet)
             return Response(data=response, status=200)
         else:
             bus = Bus.objects.get(user=busid)
-            route = Route.objects.get(bus=bus)
-            trip, created = Trip.objects.update_or_create(
+            route = Route.objects.filter(bus=bus).order_by('-id')[0]
+            trip = Trip.objects.create(
                 user=user,
                 route=route,
                 start=reading,
-                stop=reading
             )
             response = "Hello %s %s! Welcome Aboard!" % (commuter.firstName, commuter.lastName)
             return Response(data=response, status=200)
     else:
         bus = Bus.objects.get(user=busid)
-        route = Route.objects.get(bus=bus)
-        trip, created = Trip.objects.update_or_create(
+        route = Route.objects.filter(bus=bus).order_by('-id')[0]
+        trip = Trip.objects.create(
             user=user,
             route=route,
             start=reading,
-            stop=reading
         )
         response = "Hello %s %s! Welcome Aboard!" % (commuter.firstName, commuter.lastName)
         return Response(data=response, status=200)

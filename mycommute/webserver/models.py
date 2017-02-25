@@ -49,16 +49,17 @@ class Route(models.Model):
     bus = models.ForeignKey(Bus)
 
     def __str__(self):
-        return self.name
+        return u'%s %s' % (self.name, self.bus.name)
 
 class Trip(models.Model):
     user = models.ForeignKey(User)
     route = models.ForeignKey(Route)
     start = models.IntegerField()
-    stop = models.IntegerField()
+    stop = models.IntegerField(default=-1)
+    cost = models.IntegerField(default=-1)
 
     def __str__(self):
-        return u'%s %s' % (self.user.first_name, self.route.name)
+        return u'%s %s' % (self.user.username, self.route.name)
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
 def create_auth_token(sender, instance=None, created=False, **kwargs):
