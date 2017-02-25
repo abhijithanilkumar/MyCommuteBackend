@@ -16,6 +16,7 @@ class Commuter(models.Model):
     GENDER = (
         ('M', 'Male'),
         ('F', 'Female'),
+        ('O', 'Other'),
     )
     firstName = models.CharField(max_length=50)
     middleName = models.CharField(max_length=50, blank=True)

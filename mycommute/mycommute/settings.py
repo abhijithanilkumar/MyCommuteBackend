@@ -25,7 +25,7 @@ SECRET_KEY = 'u43ef4ldi&50re9k7$6x40v=k#z4cj)!@lfm*lz8$!6#f=ku@q'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -127,5 +127,11 @@ REST_FRAMEWORK = {
     # or allow read-only access for unauthenticated users.
     'DEFAULT_PERMISSION_CLASSES': [
         #'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
-    ]
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        #For admin
+        'rest_framework.authentication.SessionAuthentication',
+        #For app token
+        'rest_framework.authentication.TokenAuthentication',
+    ],
 }
