@@ -52,13 +52,13 @@ class Route(models.Model):
         return self.name
 
 class Trip(models.Model):
-    user = models.OneToOneField(User)
-    route = models.OneToOneField(Route)
+    user = models.ForeignKey(User)
+    route = models.ForeignKey(Route)
     start = models.IntegerField()
     stop = models.IntegerField()
 
     def __str__(self):
-        return u'%s %s' % (self.user.name, self.route.name)
+        return u'%s %s' % (self.user.first_name, self.route.name)
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
 def create_auth_token(sender, instance=None, created=False, **kwargs):
